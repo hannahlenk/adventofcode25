@@ -1,7 +1,7 @@
+#include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <numeric>
-#include <queue>
 #include <vector>
 #include <utility>
 
@@ -60,22 +60,20 @@ int main(int argc, char* argv[])
 		const auto lhs_dist = distance(points[lhs.idx0], points[lhs.idx1]);
 		const auto rhs_dist = distance(points[rhs.idx0], points[rhs.idx1]);
 
-		return rhs_dist<lhs_dist;
+		return lhs_dist<rhs_dist;
 	};
 
-	std::priority_queue<connection, std::vector<connection>, decltype(compare)> connections{compare};
-
+	std::vector<connection> connections;
 	for(std::size_t idx0 = 0; idx0<points.size(); ++idx0)
 	{
 		for(std::size_t idx1 = idx0+1; idx1<points.size(); ++idx1)
-			connections.push({idx0, idx1});
+			connections.push_back({idx0, idx1});
 	}
+	std::ranges::sort(connections, compare);
 
 	long long result = 0;
-	while(!connections.empty())
+	for(const auto& to_connect: connections)
 	{
-		const auto to_connect = connections.top();
-		connections.pop();
 		if(find(to_connect.idx0)!=find(to_connect.idx1))
 		{
 			merge(to_connect.idx0, to_connect.idx1);
