@@ -65,14 +65,17 @@ int main(int argc, char* argv[])
 		return rhs_dist<lhs_dist;
 	};
 
-	std::priority_queue<connection, std::vector<connection>, decltype(compare)> connections{compare};
-
-	for(std::size_t idx0 = 0; idx0<points.size(); ++idx0)
+	auto connections = [&]()
 	{
-		for(std::size_t idx1 = idx0+1; idx1<points.size(); ++idx1)
-			connections.push({idx0, idx1});
-	}
-	
+		std::vector<connection> init;
+		for(std::size_t idx0 = 0; idx0<points.size(); ++idx0)
+		{
+			for(std::size_t idx1 = idx0+1; idx1<points.size(); ++idx1)
+				init.push_back({idx0, idx1});
+		}
+		return std::priority_queue<connection, std::vector<connection>, decltype(compare)> {compare, std::move(init)};
+	}();
+		
 	for(int i=0; i<1000; ++i)
 	{
 		const auto to_connect = connections.top();
